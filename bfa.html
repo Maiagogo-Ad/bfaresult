@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Bright Future Academy · Performance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { user-select: none; box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #3d2314;
+            --accent: #f7f1e5;
+            --text-light: #f7f1e5;
+            --text-dark: #3d2314;
+            --white-glass: rgba(247, 241, 229, 0.12);
+            --soft-gold: #e8dcc4;
+        }
+        body { 
+            background: linear-gradient(145deg, #e0d5c1 0%, #c8b9a6 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif; 
+            min-height: 100vh;
+            padding: 12px;
+        }
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #2c190e, #1a0f08);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: rgba(44, 25, 14, 0.96);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 35px 28px;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 16px;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.6);
+            border: 1px solid rgba(247, 241, 229, 0.25);
+            text-align: center;
+        }
+        .login-container i.fa-graduation-cap { color: #f7f1e5; font-size: 3.8rem; margin-bottom: 8px; }
+        .login-title { color: #f7f1e5; font-size: 1.6rem; font-weight: 800; letter-spacing: 1px; }
+        .login-sub { color: #e8dcc4; margin-bottom: 28px; font-size: 0.85rem; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; color: #f7f1e5; font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; }
+        .input-group input {
+            width: 100%; padding: 14px 18px;
+            background: rgba(247, 241, 229, 0.08);
+            border: 1px solid rgba(247, 241, 229, 0.3);
+            border-radius: 60px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(95deg, #f7f1e5, #e8dcc4);
+            border: none;
+            padding: 14px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #3d2314;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .error-msg { color: #f5b08b; font-size: 0.8rem; margin-top: 12px; }
+        .main-app { display: none; }
+        .container {
+            background-color: var(--primary);
+            color: var(--text-light);
+            width: 100%; max-width: 900px; padding: 20px 16px; border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            margin: auto;
+            position: relative;
+            border: 1px solid rgba(247, 241, 229, 0.15);
+        }
+        .logout-corner {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(247, 241, 229, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 5px 12px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .active-page { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .headline { text-align: center; border-bottom: 1px solid rgba(247, 241, 229, 0.2); padding-bottom: 12px; margin-bottom: 18px; font-size: 1.4rem; color: var(--accent); }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        @media (min-width: 640px) { .grid-container { grid-template-columns: repeat(3, 1fr); gap: 15px; } }
+        .grid-item {
+            background-color: var(--accent); color: var(--text-dark); padding: 18px 8px; border-radius: 20px;
+            display: flex; flex-direction: column; align-items: center; border: none; font-weight: 700; cursor: pointer; gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .grid-item i { font-size: 1.8rem; color: #3d2314; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { font-size: 0.75rem; margin-bottom: 6px; font-weight: 600; color: var(--accent); display: block; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; border-radius: 16px; 
+            background: var(--white-glass); color: var(--text-light); 
+            border: 1px solid rgba(247, 241, 229, 0.25); outline: none; 
+            font-size: 0.95rem;
+        }
+        input[type="date"] { color-scheme: dark; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .list-header { background: var(--white-glass); padding: 12px 18px; border-radius: 16px; cursor: pointer; display: flex; justify-content: space-between; margin: 18px 0; border: 1px solid rgba(247, 241, 229, 0.1); }
+        .item-list { list-style: none; background: rgba(0,0,0,0.25); border-radius: 16px; display: none; margin-bottom: 18px; max-height: 300px; overflow-y: auto; }
+        .list-item { padding: 12px 18px; border-bottom: 1px solid rgba(247, 241, 229, 0.08); cursor: pointer; color: var(--accent); }
+        .list-item.selected { background-color: var(--accent); color: var(--text-dark); font-weight: bold; border-radius: 8px; }
+        .sticky-subject-wrapper {
+            position: sticky; top: 0; z-index: 100;
+            background: linear-gradient(to right, var(--accent), #e8dcc4);
+            border-radius: 16px; margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 14px; gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .sticky-subject { color: var(--text-dark); font-weight: 800; font-size: 0.95rem; flex: 1; text-align: center; }
+        .logout-inside-sticky { background: rgba(61,35,20,0.25); border: 1px solid var(--text-dark); color: var(--text-dark); padding: 5px 12px; border-radius: 40px; cursor: pointer; font-size: 0.7rem; }
+        .search-student-bar { background: rgba(61,35,20,0.7); padding: 10px; border-radius: 40px; margin-bottom: 18px; }
+        .search-student-bar input { background: rgba(247, 241, 229, 0.15); border-radius: 40px; padding: 10px 16px; width: 100%; border: 1px solid var(--accent); color: white; }
+        .student-card { background: var(--white-glass); padding: 14px; border-radius: 18px; margin-bottom: 12px; border: 1px solid rgba(247, 241, 229, 0.08); }
+        .student-card.hidden { display: none; }
+        .mark-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+        .btn-box { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .btn { padding: 12px; border-radius: 40px; border: none; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: justify; gap: 8px; font-size: 0.9rem; transition: 0.2s; }
+        .btn-wheat { background-color: var(--accent); color: var(--text-dark); }
+        .btn-outline { background: transparent; color: var(--text-light); border: 2px solid var(--accent); }
+        .btn-full { grid-column: span 2; }
+        .btn-green { background: #5a341e; color: white; }
+        .save-marks-container { margin-top: 20px; margin-bottom: 12px; }
+        .btn-save-full { width: 100%; background: #5a341e; color: white; border: none; padding: 14px; border-radius: 40px; font-weight: 700; }
+        .collapsible-textarea-btn { background: var(--accent); color: var(--text-dark); border: none; padding: 10px 16px; border-radius: 40px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .bulk-area-wrapper { display: none; margin-top: 8px; margin-bottom: 12px; }
+        .bulk-area-wrapper.show { display: block; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; overflow-y: auto; padding: 16px; }
+        .modal-content { max-width: 900px; margin: 16px auto; background: #fdfbf7; border-radius: 20px; padding: 16px; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 18px; font-size: 32px; cursor: pointer; color: #3d2314; }
+
+        /* Enhanced Result Card Styling */
+        .result-card {
+            background: #ffffff;
+            color: #2b1a0e;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 24px;
+            border-radius: 12px;
+            border: 2px solid #3d2314;
+            max-width: 100%;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 4px 15px rgba(61, 35, 20, 0.08);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            position: relative;
+        }
+        .result-header { 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px; 
+            border-bottom: 2px solid #3d2314; 
+            padding-bottom: 12px;
+            position: relative;
+        }
+        .header-logo {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .header-text {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .header-spacer {
+            width: 75px;
+            flex-shrink: 0;
+        }
+        .result-header h1 { font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; color: #3d2314; letter-spacing: 0.5px; text-transform: uppercase; }
+        .result-header h3 { font-size: 0.95rem; font-weight: 700; color: #5a341e; margin-bottom: 2px; }
+        .session-bold { font-size: 0.85rem; font-weight: 700; color: #3d2314; }
+        .info-table-bw { width: 100%; border-collapse: collapse; margin: 12px 0; border: 1.5px solid #3d2314; font-size: 0.8rem; }
+        .info-table-bw td { border: 1px solid #3d2314; padding: 6px 10px; vertical-align: middle; }
+        .info-table-bw td:nth-child(odd) { font-weight: 700; background: #f7f1e5; color: #3d2314; width: 18%; }
+        .results-table-bw { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.78rem; border: 1.5px solid #3d2314; }
+        .results-table-bw th, .results-table-bw td { border: 1px solid #3d2314; padding: 6px 8px; text-align: center; }
+        .results-table-bw th { background: #3d2314; color: #f7f1e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .results-table-bw tr:nth-child(even) { background-color: #fcfbfa; }
+        .results-table-bw td:first-child { text-align: left; font-weight: 600; padding-left: 10px; }
+        .summary-section { margin: 12px 0; padding: 8px 12px; border: 1.5px solid #3d2314; background: #f7f1e5; font-size: 0.82rem; border-radius: 4px; }
+        .summary-grid { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 8px; }
+        .summary-grid span strong { color: #3d2314; font-weight: 800; }
+        .teacher-remark { text-align: center; margin: 12px 0; font-size: 0.85rem; padding: 8px; border: 1px dashed #3d2314; background: #fffdfa; border-radius: 4px; }
+        .signature-area-bw { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 12px; border-top: 1.5px solid #3d2314; font-size: 0.75rem; flex-wrap: wrap; gap: 12px; }
+        .signature-line { text-align: center; min-width: 140px; }
+        .signature-line strong { font-weight: 800; color: #3d2314; }
+        .next-term { margin-top: 10px; text-align: center; font-size: 0.75rem; font-weight: 600; color: #5a341e; border-top: 1px dashed #3d2314; padding-top: 8px; }
+
+        .student-selector-dropdown { margin-bottom: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .student-selector-dropdown select { background: #f5efe6; color: #3d2314; padding: 6px 12px; border-radius: 40px; border: 1px solid #3d2314; flex: 2; min-width: 140px; font-size: 0.8rem; }
+        .chart-analytics-container { background: #fdfbf7; border-radius: 24px; padding: 16px; color: #3d2314; }
+        canvas { max-height: 280px; width: 100%; }
+        .print-btn-group { margin-top: 8px; text-align: center; }
+        .btn-print {
+            background: #3d2314; color: white; border: none;
+            padding: 8px 18px; border-radius: 40px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.85rem;
+        }
+        .btn-print:hover { background: #5a341e; }
+        .import-export-section {
+            background: var(--white-glass);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(247, 241, 229, 0.15);
+        }
+        .import-export-section h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .import-export-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .btn-import-export {
+            padding: 10px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-export { background: #5a341e; color: white; }
+        .btn-import { background: var(--accent); color: var(--text-dark); }
+        .file-input-wrapper {
+            display: none;
+            margin-top: 10px;
+        }
+        .file-input-wrapper.show { display: block; }
+        .file-input-wrapper input[type="file"] {
+            background: rgba(247,241,229,0.1);
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px dashed var(--accent);
+            color: var(--accent);
+            width: 100%;
+        }
+        .logo-placeholder {
+            width: 75px;
+            height: 75px;
+            background: #f7f1e5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #3d2314;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        @media (max-width: 640px) {
+            .result-card { padding: 14px; }
+            .header-logo { width: 50px; height: 50px; margin-right: 8px; }
+            .header-spacer { width: 0; display: none; }
+            .result-header h1 { font-size: 0.95rem; }
+            .result-header h3 { font-size: 0.8rem; }
+            .results-table-bw th, .results-table-bw td { padding: 4px 3px; font-size: 0.65rem; }
+            .info-table-bw td { padding: 4px; font-size: 0.68rem; }
+            .import-export-buttons { grid-template-columns: 1fr; }
+            .logo-placeholder { width: 50px; height: 50px; font-size: 22px; margin-right: 8px; }
+        }
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            #loginOverlay, .logout-corner, .container > .page:not(#resultModal), 
+            .modal-content .close-modal, .student-selector-dropdown, .print-btn-group,
+            .btn, .btn-print, .btn-wheat, .btn-outline, #printResultsBtn { display: none !important; }
+            .modal { display: block !important; position: static !important; background: white !important; padding: 0; }
+            .modal-content { box-shadow: none !important; border: none; padding: 0; margin: 0; border-radius: 0; }
+            .result-card { 
+                border: 2px solid #3d2314; 
+                box-shadow: none; 
+                page-break-after: always; 
+                page-break-inside: avoid;
+                margin: 0 auto;
+                width: 100%;
+                max-width: 100%;
+                padding: 20px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+            .result-card:last-child { page-break-after: avoid; }
+            .results-container { max-width: 100%; }
+            .info-table-bw td, .info-table-bw th { border-color: #3d2314 !important; font-size: 0.8rem; padding: 5px 8px; }
+            .results-table-bw th, .results-table-bw td { border-color: #3d2314 !important; font-size: 0.75rem; padding: 5px 6px; }
+            .summary-section { font-size: 0.8rem; }
+            .teacher-remark { font-size: 0.82rem; }
+            .signature-area-bw { font-size: 0.75rem; }
+            .next-term { font-size: 0.75rem; }
+            .header-logo { width: 65px; height: 65px; }
+            .result-header h1 { font-size: 1.3rem; }
+            .result-header h3 { font-size: 0.95rem; }
+            .session-bold { font-size: 0.85rem; }
+            .logo-placeholder { width: 65px; height: 65px; font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-container">
+        <i class="fas fa-graduation-cap"></i>
+        <div class="login-title">BRIGHT FUTURE ACADEMY</div>
+        <div class="login-sub">Primary & Secondary School · Potiskum</div>
+        <div class="input-group"><label>Username</label><input type="text" id="loginUsername" value="Bright Future Academy"></div>
+        <div class="input-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password"></div>
+        <button class="btn-login" id="passwordLoginBtn"><i class="fas fa-key"></i> Login</button>
+        <div id="loginErrorMsg" class="error-msg"></div>
+    </div>
+</div>
+
+<div class="main-app" id="mainApp">
+    <div class="container">
+        <button class="logout-corner" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <div id="dashboardPage" class="page active-page">
+            <div style="text-align:center; margin-bottom:16px;"><i class="fas fa-graduation-cap fa-3x" style="color: var(--accent);"></i><h1 style="font-size:1.6rem; color: var(--accent);">Bright Future Academy</h1><p style="color:var(--accent);">Primary & Secondary School · Potiskum</p></div>
+            
+            <div class="import-export-section">
+                <h3><i class="fas fa-share-alt"></i> Share Data (Export/Import)</h3>
+                <div class="import-export-buttons">
+                    <button class="btn-import-export btn-export" onclick="exportAllData()">
+                        <i class="fas fa-download"></i> Export All Data
+                    </button>
+                    <button class="btn-import-export btn-import" onclick="toggleImport()">
+                        <i class="fas fa-upload"></i> Import Data
+                    </button>
+                </div>
+                <div id="fileInputWrapper" class="file-input-wrapper">
+                    <input type="file" id="importFileInput" accept=".json" onchange="importAllData(event)">
+                    <small style="color: var(--accent); display: block; margin-top: 6px;">Select a .json file exported from this system</small>
+                </div>
+            </div>
+
+            <div class="grid-container">
+                <button class="grid-item" onclick="showPage('infoPage')"><i class="fas fa-school"></i> School Info</button>
+                <button class="grid-item" onclick="showPage('subjectsPage')"><i class="fas fa-book"></i> Subjects</button>
+                <button class="grid-item" onclick="showPage('studentsPage')"><i class="fas fa-user-graduate"></i> Students</button>
+                <button class="grid-item" onclick="openResultSelector()"><i class="fas fa-eye"></i> View Results</button>
+                <button class="grid-item" onclick="showPerformanceChart()"><i class="fas fa-chart-bar"></i> Analytics</button>
+                <button class="grid-item" onclick="showPage('resetPage')"><i class="fas fa-exclamation-triangle"></i> Reset</button>
+            </div>
+        </div>
+
+        <div id="infoPage" class="page">
+            <h2 class="headline">School Details</h2>
+            <div class="form-group"><label>School Name</label><input type="text" id="schoolNameInput" value="BRIGHT FUTURE ACADEMY PRIMARY & SECONDARY SCHOOL POTISKUM"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="school_class">
+                        <option value="Primary 1">Primary 1</option>
+                        <option value="Primary 2">Primary 2</option>
+                        <option value="Primary 3">Primary 3</option>
+                        <option value="Primary 4">Primary 4</option>
+                        <option value="Primary 5">Primary 5</option>
+                        <option value="Primary 6">Primary 6</option>
+                        <option value="Primary 6">JSS 1</option>
+                        <option value="Primary 6">JSS 2</option>
+                        <option value="Primary 6">JSS 3</option>
+                        <option value="Primary 6">SSS 1</option>
+                        <option value="Primary 6">SSS 2</option>
+                        <option value="Primary 6">SSS 3</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Department</label><input type="text" id="school_dept" placeholder="Science/Arts"></div>
+            </div>
+            <div class="form-group"><label>Class Teacher's Name</label><input type="text" id="school_teacher" placeholder="Mal. Adam"></div>
+            <div class="form-group"><label>Headmaster's Name</label><input type="text" id="school_principal" placeholder="Mal. Yusuf"></div>
+            <div class="form-row"><div class="form-group"><label>Session</label><input type="text" id="school_sess" placeholder="2024/2025"></div><div class="form-group"><label>Term</label><select id="school_term"><option>First Term</option><option>Second Term</option><option>Third Term</option></select></div></div>
+            <div class="form-row"><div class="form-group"><label>Next Term Begins</label><input type="date" id="term_begin"></div></div>
+            <div class="btn-box"><button class="btn btn-wheat" onclick="saveSchoolData()">SAVE</button><button class="btn btn-outline" onclick="showPage('dashboardPage')">BACK</button></div>
+        </div>
+
+        <div id="subjectsPage" class="page">
+            <h2 class="headline">Subjects</h2>
+            <div class="form-row"><input type="text" id="subjectInput" placeholder="New Subject"><button class="btn btn-wheat" onclick="addItem('subjects')">ADD</button></div>
+            <div class="list-header" onclick="toggleList('subjectList')"><span>Subjects List</span><i class="fas fa-chevron-down"></i></div>
+            <ul id="subjectList" class="item-list"></ul>
+            <div class="btn-box"><button class="btn btn-wheat" onclick="editItem('subjects')">EDIT</button><button class="btn btn-outline" onclick="removeItem('subjects')">REMOVE</button><button class="btn btn-wheat btn-full" onclick="saveListData('subjects')">SAVE</button><button class="btn btn-outline btn-full" onclick="showPage('dashboardPage')">BACK</button></div>
+        </div>
+
+        <div id="studentsPage" class="page">
+            <h2 class="headline">Students</h2>
+            <div class="form-group"><label>Full Name</label><input type="text" id="studentInput"></div>
+            <button id="toggleBulkBtn" class="collapsible-textarea-btn"><i class="fas fa-chevron-down"></i> Show Paste Area</button>
+            <div id="bulkAreaWrapper" class="bulk-area-wrapper"><div class="form-group"><label>Paste Students (One per line)</label><textarea id="bulkStudentInput" rows="4"></textarea></div></div>
+            <div class="form-row"><div class="form-group"><label>Gender</label><select id="genderInput"><option>Male</option><option>Female</option></select></div><button class="btn btn-wheat" onclick="addStudentItem()">ADD</button></div>
+            <div class="list-header" onclick="toggleList('studentList')"><span>Student Roster</span><i class="fas fa-chevron-down"></i></div>
+            <ul id="studentList" class="item-list"></ul>
+            <div class="btn-box"><button class="btn btn-wheat" onclick="editItem('students')">EDIT</button><button class="btn btn-outline" onclick="removeItem('students')">REMOVE</button><button class="btn btn-wheat btn-full" onclick="saveListData('students')">SAVE</button><button class="btn btn-wheat btn-full" style="background:#e8dcc4;color:#3d2314;" onclick="startMarkEntry()">START MARK ENTRY</button><button class="btn btn-outline btn-full" onclick="showPage('dashboardPage')">BACK</button></div>
+        </div>
+
+        <div id="resetPage" class="page">
+            <h2 class="headline">Security Reset</h2>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn btn-outline" onclick="secureReset('info')">RESET SCHOOL INFO</button>
+                <button class="btn btn-outline" onclick="secureReset('subjects')">RESET SUBJECTS</button>
+                <button class="btn btn-outline" onclick="secureReset('scores')">RESET SCORES</button>
+                <button class="btn btn-wheat" style="background:#a63d3d; color:white;" onclick="secureReset('all')">FULL WIPE</button>
+            </div>
+            <button class="btn btn-outline btn-full" style="margin-top:20px;" onclick="showPage('dashboardPage')">BACK</button>
+        </div>
+
+        <div id="entryPage" class="page">
+            <div class="sticky-subject-wrapper"><div class="sticky-subject" id="stickySub">Subject</div><button class="logout-inside-sticky" id="logoutInsideStickyBtn"><i class="fas fa-sign-out-alt"></i> Exit</button></div>
+            <div class="search-student-bar"><input type="text" id="studentSearchInput" placeholder="🔍 Search student..."></div>
+            <div id="markList"></div>
+            <div class="btn-box"><button class="btn btn-outline" onclick="navigateSubject(-1)">◀ PREV</button><button class="btn btn-wheat" onclick="navigateSubject(1)">NEXT ▶</button></div>
+            <div class="save-marks-container"><button class="btn btn-save-full" onclick="saveAllMarks()"><i class="fas fa-save"></i> SAVE ALL MARKS</button></div>
+            <button class="btn btn-outline btn-full" onclick="showPage('dashboardPage')">BACK</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="student-selector-dropdown">
+            <select id="resultStudentSelect"></select>
+            <button class="btn btn-wheat" onclick="generateSingleResult()"><i class="fas fa-file-alt"></i> Generate Result</button>
+            <button class="btn btn-outline" onclick="generateFullResults()" style="background:#3d2314; color:white;">All Students</button>
+        </div>
+        <div id="modalResultContent" class="results-container"></div>
+        <div class="print-btn-group">
+            <button class="btn-print" id="printResultsBtn" onclick="printResults()">
+                <i class="fas fa-print"></i> PRINT RESULTS
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="chartModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeChartModal()">&times;</span><div class="chart-analytics-container"><h3>Student Performance</h3><div class="chart-student-selector"><select id="chartStudentSelect"></select><button class="btn btn-wheat" onclick="updateChart()">Refresh</button></div><div id="chartStats"></div><canvas id="performanceChart"></canvas></div></div></div>
+
+<script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    const STORED_PASSWORD_KEY = 'school_password';
+    const SCHOOL_USERNAME = "Bright Future Academy";
+    const DEFAULT_PASSWORD = "12345";
+    
+    const DEFAULT_SCHOOL_NAME = "BRIGHT FUTURE ACADEMY PRIMARY & SECONDARY SCHOOL POTISKUM";
+    
+    let data = { 
+        subjects: JSON.parse(localStorage.getItem('bfa_subjects')) || [], 
+        students: JSON.parse(localStorage.getItem('bfa_students')) || [] 
+    };
+    let marksData = JSON.parse(localStorage.getItem('bfa_marks')) || {};
+    let selection = { subjects: -1, students: -1 };
+    let activeSubIdx = 0, chartInstance = null;
+    
+    function exportAllData() {
+        try {
+            const schoolInfo = JSON.parse(localStorage.getItem('bfa_school_info')) || {};
+            const exportData = {
+                version: "1.0",
+                exportedAt: new Date().toISOString(),
+                schoolInfo: schoolInfo,
+                subjects: data.subjects,
+                students: data.students,
+                marks: marksData,
+                password: localStorage.getItem(STORED_PASSWORD_KEY) || DEFAULT_PASSWORD
+            };
+            
+            const jsonStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            const dateStr = new Date().toISOString().slice(0,10);
+            a.download = `bright_future_school_data_${dateStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert("✅ Data exported successfully!\nThe file contains all students, subjects, marks, and school information.");
+        } catch (error) {
+            alert("❌ Error exporting data: " + error.message);
+        }
+    }
+    
+    function toggleImport() {
+        const wrapper = document.getElementById('fileInputWrapper');
+        wrapper.classList.toggle('show');
+        if (!wrapper.classList.contains('show')) {
+            document.getElementById('importFileInput').value = '';
+        }
+    }
+    
+    function importAllData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importData = JSON.parse(e.target.result);
+                
+                if (!importData.subjects || !importData.students || !importData.marks) {
+                    alert("❌ Invalid file format. Please make sure you're importing a valid export file.");
+                    return;
+                }
+                
+                const confirmMsg = `This will replace ALL current data with the imported data.\n\n` +
+                    `📊 Subjects: ${importData.subjects.length}\n` +
+                    `👨‍🎓 Students: ${importData.students.length}\n` +
+                    `📝 Marks: ${Object.keys(importData.marks).length} subjects\n` +
+                    `\nAre you sure you want to proceed?`;
+                
+                if (!confirm(confirmMsg)) {
+                    document.getElementById('importFileInput').value = '';
+                    return;
+                }
+                
+                data.subjects = importData.subjects;
+                data.students = importData.students;
+                marksData = importData.marks;
+                
+                if (importData.schoolInfo) {
+                    localStorage.setItem('bfa_school_info', JSON.stringify(importData.schoolInfo));
+                }
+                
+                if (importData.password) {
+                    localStorage.setItem(STORED_PASSWORD_KEY, importData.password);
+                }
+                
+                localStorage.setItem('bfa_subjects', JSON.stringify(data.subjects));
+                localStorage.setItem('bfa_students', JSON.stringify(data.students));
+                localStorage.setItem('bfa_marks', JSON.stringify(marksData));
+                
+                renderList('subjects');
+                renderList('students');
+                loadSchoolData();
+                
+                selection = { subjects: -1, students: -1 };
+                
+                alert("✅ Data imported successfully!\n\n" +
+                    `📊 Subjects: ${data.subjects.length}\n` +
+                    `👨‍🎓 Students: ${data.students.length}\n` +
+                    `📝 Subjects with marks: ${Object.keys(marksData).length}`);
+                
+                document.getElementById('fileInputWrapper').classList.remove('show');
+                document.getElementById('importFileInput').value = '';
+                
+            } catch (error) {
+                alert("❌ Error importing data: " + error.message + "\n\nPlease make sure you're importing a valid JSON file.");
+                document.getElementById('importFileInput').value = '';
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    function cleanupMarksData() {
+        let newMarksData = {};
+        let studentCount = data.students.length;
+        let subjectCount = data.subjects.length;
+        
+        // Clean up marks for removed subjects and students
+        for(let sub in marksData) {
+            if(parseInt(sub) >= subjectCount) {
+                // Subject was removed, skip it
+                continue;
+            }
+            newMarksData[sub] = {};
+            let newIdx = 0;
+            for(let oldIdx in marksData[sub]) {
+                if(parseInt(oldIdx) < studentCount) {
+                    newMarksData[sub][newIdx] = marksData[sub][oldIdx];
+                    newIdx++;
+                }
+            }
+        }
+        marksData = newMarksData;
+        localStorage.setItem('bfa_marks', JSON.stringify(marksData));
+    }
+    
+    function authenticateWithPassword() {
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        if (username !== SCHOOL_USERNAME) { document.getElementById('loginErrorMsg').innerText = "Username mismatch."; return; }
+        let stored = localStorage.getItem(STORED_PASSWORD_KEY);
+        let ok = (stored && stored === password) || (!stored && password === DEFAULT_PASSWORD);
+        if (ok) { if (!stored) localStorage.setItem(STORED_PASSWORD_KEY, password); loginSuccess(); }
+        else document.getElementById('loginErrorMsg').innerText = "Invalid password.";
+    }
+    function loginSuccess() { 
+        document.getElementById('loginOverlay').style.display = 'none'; 
+        document.getElementById('mainApp').style.display = 'block'; 
+        loadSchoolData(); 
+        renderList('subjects'); 
+        renderList('students'); 
+        showPage('dashboardPage'); 
+    }
+    function logout() { 
+        document.getElementById('mainApp').style.display = 'none'; 
+        document.getElementById('loginOverlay').style.display = 'flex'; 
+        if(window.chartInstance) window.chartInstance.destroy(); 
+    }
+    function getLogoHTML() {
+    // Try to load logo.png, fallback to school icon if not available
+    return `<img src="logo.png" alt="School Logo" class="header-logo" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-placeholder\'><i class=\'fas fa-graduation-cap\'></i></div>';">`;
+    }
+    
+    function calculateGrade(total) { if(total>=70) return 'A'; if(total>=60) return 'B'; if(total>=50) return 'C'; if(total>=40) return 'D'; if(total>=30) return 'E'; return 'F'; }
+    function getRemark(grade) { const r={A:'Excellent',B:'Very Good',C:'Good',D:'Pass', E:'Weak Pass', F:'Fail'}; return r[grade]; }
+    function getStudentAverage(studentIdx) { 
+        let total=0,count=0; 
+        for(let sub=0;sub<data.subjects.length;sub++){ 
+            let m=(marksData[sub]&&marksData[sub][studentIdx])?marksData[sub][studentIdx]:{ca1:0,ca2:0,exam:0}; 
+            total+=(Number(m.ca1)||0)+(Number(m.ca2)||0)+(Number(m.exam)||0); 
+            count++;
+        } 
+        return count?total/count:0;
+    }
+    function formatDateDMY(dateStr) { if (!dateStr) return ''; let d = new Date(dateStr); if (isNaN(d.getTime())) return dateStr; return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; }
+    
+    function getStudentsSortedByPerformance() { 
+        let studentsWithAvg = data.students.map((student, idx) => ({ 
+            idx, 
+            name: student.name, 
+            gender: student.gender, 
+            average: getStudentAverage(idx) 
+        })); 
+        studentsWithAvg.sort((a,b) => b.average - a.average); 
+        return studentsWithAvg; 
+    }
+    
+    function getStudentPosition(studentIdx) { 
+        let sorted = getStudentsSortedByPerformance();
+        let targetAvg = sorted.find(s => s.idx === studentIdx)?.average;
+        if (targetAvg === undefined) return data.students.length;
+        let firstPos = sorted.findIndex(s => s.average === targetAvg);
+        return firstPos + 1;
+    }
+    
+    function showPage(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page')); document.getElementById(id).classList.add('active-page'); if(id==='infoPage') loadSchoolData(); }
+    function toggleList(id) { let el=document.getElementById(id); if(el) el.style.display = el.style.display==='block'?'none':'block'; }
+    
+    function addItem(type) { 
+        let inp = document.getElementById('subjectInput'); 
+        if(inp.value.trim()){ 
+            let pos = prompt("Enter position to insert subject (1 = top, leave empty = bottom)"); 
+            if(pos === null || pos === "" || isNaN(pos)) data.subjects.push(inp.value.trim()); 
+            else { let index = Math.max(0, Math.min(data.subjects.length, parseInt(pos)-1)); data.subjects.splice(index,0,inp.value.trim()); } 
+            inp.value=""; 
+            localStorage.setItem(`bfa_subjects`, JSON.stringify(data.subjects));
+            renderList('subjects'); 
+        } 
+    }
+    
+    function addStudentItem() { 
+        let name = document.getElementById('studentInput').value.trim(); 
+        let gender = document.getElementById('genderInput').value; 
+        if(name){ 
+            let pos = prompt("Enter position to insert student (1 = top, leave empty = bottom)"); 
+            if(pos === null || pos === "" || isNaN(pos)) data.students.push({name,gender}); 
+            else { let index = Math.max(0, Math.min(data.students.length, parseInt(pos)-1)); data.students.splice(index,0,{name,gender}); } 
+            document.getElementById('studentInput').value = ""; 
+            localStorage.setItem(`bfa_students`, JSON.stringify(data.students));
+            renderList('students'); 
+        } 
+        let bulk = document.getElementById('bulkStudentInput'); 
+        if(bulk && bulk.value.trim()){ 
+            let lines = bulk.value.split(/\n|\r/).map(x=>x.trim()).filter(Boolean); 
+            let pos = prompt("Enter starting position for pasted students (1 = top, leave empty = bottom)"); 
+            if(pos === null || pos === "" || isNaN(pos)) lines.forEach(line=> data.students.push({name:line,gender})); 
+            else { let index = Math.max(0, Math.min(data.students.length, parseInt(pos)-1)); lines.forEach((line,i)=> data.students.splice(index+i,0,{name:line,gender}));} 
+            bulk.value=""; 
+            localStorage.setItem(`bfa_students`, JSON.stringify(data.students));
+            renderList('students');
+        } 
+    }
+    
+    function renderList(type) { 
+        let listEl = document.getElementById(type==='subjects'?'subjectList':'studentList'); 
+        if(!listEl) return; 
+        listEl.innerHTML=""; 
+        data[type].forEach((item,idx)=>{ 
+            let li=document.createElement('li'); 
+            li.className=`list-item ${selection[type]===idx?'selected':''}`; 
+            li.innerText=type==='subjects'?item:`${item.name} (${item.gender})`; 
+            li.onclick=()=>{ selection[type]=(selection[type]===idx)?-1:idx; renderList(type); }; 
+            listEl.appendChild(li); 
+        }); 
+    }
+    
+    function editItem(type) { 
+        if(selection[type]===-1) return; 
+        let newVal = prompt("Edit:", type==='subjects'? data.subjects[selection[type]] : data.students[selection[type]].name); 
+        if(newVal){ 
+            if(type==='subjects') data.subjects[selection[type]] = newVal; 
+            else { 
+                let gender = prompt("Gender", data.students[selection[type]].gender); 
+                data.students[selection[type]].name = newVal; 
+                if(gender) data.students[selection[type]].gender = gender; 
+            } 
+            localStorage.setItem(`bfa_${type}`, JSON.stringify(data[type]));
+            renderList(type); 
+        } 
+    }
+    
+    function removeItem(type) { 
+        if(selection[type]===-1) return; 
+        let pass = prompt("Enter password"); 
+        let stored = localStorage.getItem(STORED_PASSWORD_KEY) || DEFAULT_PASSWORD; 
+        if(pass !== stored) return; 
+        data[type].splice(selection[type],1); 
+        selection[type]=-1; 
+        localStorage.setItem(`bfa_${type}`, JSON.stringify(data[type]));
+        
+        // Clean up marks data when removing subjects or students
+        cleanupMarksData();
+        
+        if(type === 'students') {
+            if(document.getElementById('entryPage').classList.contains('active-page')) {
+                renderMarkCards();
+            }
+        }
+        renderList(type); 
+    }
+    
+    function saveListData(type) { 
+        localStorage.setItem(`bfa_${type}`,JSON.stringify(data[type])); 
+        alert("Saved!"); 
+    }
+    
+    function secureReset(t) { 
+        let pass = prompt("Enter password"); 
+        let stored = localStorage.getItem(STORED_PASSWORD_KEY) || DEFAULT_PASSWORD; 
+        if(pass !== stored) return; 
+        if(confirm(`Reset ${t}?`)){ 
+            if(t==='info') localStorage.removeItem('bfa_school_info'); 
+            if(t==='subjects'){ 
+                localStorage.removeItem('bfa_subjects'); 
+                data.subjects=[]; 
+                renderList('subjects');
+                cleanupMarksData();
+            } 
+            if(t==='scores'){ 
+                localStorage.removeItem('bfa_marks'); 
+                marksData={}; 
+            } 
+            if(t==='all'){ 
+                localStorage.clear(); 
+                location.reload(); 
+            } 
+            showPage('dashboardPage'); 
+        } 
+    }
+    
+    function saveSchoolData() { 
+        let info={ 
+            stud:document.getElementById('schoolNameInput').value, 
+            cls:document.getElementById('school_class').value, 
+            dept:document.getElementById('school_dept').value, 
+            teacher:document.getElementById('school_teacher').value, 
+            prn:document.getElementById('school_principal').value, 
+            sess:document.getElementById('school_sess').value, 
+            trm:document.getElementById('school_term').value, 
+            begin:document.getElementById('term_begin').value 
+        }; 
+        localStorage.setItem('bfa_school_info',JSON.stringify(info)); 
+        alert("School info saved!"); 
+    }
+    
+    function loadSchoolData() { 
+        let s=JSON.parse(localStorage.getItem('bfa_school_info')); 
+        if(s){ 
+            document.getElementById('schoolNameInput').value=s.stud||''; 
+            document.getElementById('school_class').value=s.cls||'Primary 1'; 
+            document.getElementById('school_dept').value=s.dept||''; 
+            document.getElementById('school_teacher').value=s.teacher||''; 
+            document.getElementById('school_principal').value=s.prn||''; 
+            document.getElementById('school_sess').value=s.sess||''; 
+            document.getElementById('school_term').value=s.trm||'First Term'; 
+            document.getElementById('term_begin').value=s.begin||''; 
+        } 
+    }
+    
+    function startMarkEntry() { 
+        if(!data.subjects.length||!data.students.length) return alert("Add subjects & students"); 
+        activeSubIdx=0; 
+        loadEntryScreen(); 
+        showPage('entryPage'); 
+    }
+    
+    function loadEntryScreen() { 
+        document.getElementById('stickySub').innerText = data.subjects[activeSubIdx]; 
+        renderMarkCards(); 
+        attachSearch(); 
+    }
+    
+    function renderMarkCards() { 
+        let list = document.getElementById('markList'); 
+        list.innerHTML = ""; 
+        data.students.forEach((st, idx) => { 
+            let ex = (marksData[activeSubIdx] && marksData[activeSubIdx][idx]) ? marksData[activeSubIdx][idx] : { ca1: '', ca2: '', exam: '' }; 
+            let card = document.createElement('div'); 
+            card.className = 'student-card'; 
+            card.setAttribute('data-student-name', st.name.toLowerCase()); 
+            card.setAttribute('data-student-index', idx);
+            card.innerHTML = `<strong>${st.name}</strong><div class="mark-row"><div><small>CA1(20)</small><input type="number" class="ca1-input" value="${ex.ca1}" onchange="checkLimit(this,20)"></div><div><small>CA2(20)</small><input type="number" class="ca2-input" value="${ex.ca2}" onchange="checkLimit(this,20)"></div><div><small>Exam(60)</small><input type="number" class="exam-input" value="${ex.exam}" onchange="checkLimit(this,60)"></div></div>`; 
+            list.appendChild(card); 
+        }); 
+    }
+    
+    function attachSearch() { 
+        let searchInput = document.getElementById('studentSearchInput'); 
+        if(searchInput) searchInput.oninput = function() { 
+            let term = this.value.trim().toLowerCase(); 
+            document.querySelectorAll('#markList .student-card').forEach(card => { 
+                let name = card.getAttribute('data-student-name') || ''; 
+                card.classList.toggle('hidden', !name.includes(term)); 
+            }); 
+        }; 
+    }
+    
+    function checkLimit(el,max) { 
+        let v=Number(el.value); 
+        if(v>max){ alert(`Max ${max}`); el.value=max; } 
+        if(v<0) el.value=0; 
+    }
+    
+    function saveAllMarks() { 
+        let cards = document.querySelectorAll('#markList .student-card'); 
+        for(let i=0;i<cards.length;i++){ 
+            let ca1=cards[i].querySelector('.ca1-input')?.value||0; 
+            let ca2=cards[i].querySelector('.ca2-input')?.value||0; 
+            let exam=cards[i].querySelector('.exam-input')?.value||0; 
+            if(!marksData[activeSubIdx]) marksData[activeSubIdx]={}; 
+            marksData[activeSubIdx][i]={ca1:Number(ca1),ca2:Number(ca2),exam:Number(exam)}; 
+        } 
+        localStorage.setItem('bfa_marks',JSON.stringify(marksData)); 
+        alert(`Saved ${data.subjects[activeSubIdx]}`); 
+    }
+    
+    function saveAllMarksSilent() { 
+        let cards = document.querySelectorAll('#markList .student-card'); 
+        for(let i=0;i<cards.length;i++){ 
+            let ca1=cards[i].querySelector('.ca1-input')?.value||0; 
+            let ca2=cards[i].querySelector('.ca2-input')?.value||0; 
+            let exam=cards[i].querySelector('.exam-input')?.value||0; 
+            if(!marksData[activeSubIdx]) marksData[activeSubIdx]={}; 
+            marksData[activeSubIdx][i]={ca1:Number(ca1),ca2:Number(ca2),exam:Number(exam)}; 
+        } 
+        localStorage.setItem('bfa_marks',JSON.stringify(marksData)); 
+    }
+    
+    function navigateSubject(dir) { 
+        saveAllMarksSilent(); 
+        let newIdx = activeSubIdx + dir; 
+        if(newIdx < 0) newIdx = 0; 
+        if(newIdx >= data.subjects.length) newIdx = data.subjects.length - 1; 
+        if(newIdx !== activeSubIdx) { 
+            activeSubIdx = newIdx; 
+            loadEntryScreen(); 
+        } 
+    }
+    
+    function showPerformanceChart() { 
+        if(!data.students.length) return alert("Add students"); 
+        document.getElementById('chartModal').style.display='block'; 
+        let sel=document.getElementById('chartStudentSelect'); 
+        sel.innerHTML=''; 
+        data.students.forEach((s,i)=>{ 
+            let opt=document.createElement('option'); 
+            opt.value=i; 
+            opt.textContent=`${s.name} (${s.gender})`; 
+            sel.appendChild(opt); 
+        }); 
+        updateChart(); 
+    }
+    
+    function updateChart(){ 
+        let idx=parseInt(document.getElementById('chartStudentSelect').value); 
+        let s=data.students[idx]; 
+        let subs=[], scores=[]; 
+        for(let sub=0;sub<data.subjects.length;sub++){ 
+            let m=(marksData[sub]&&marksData[sub][idx])?marksData[sub][idx]:{ca1:0,ca2:0,exam:0}; 
+            let tot=(m.ca1||0)+(m.ca2||0)+(m.exam||0); 
+            subs.push(data.subjects[sub].length>12?data.subjects[sub].slice(0,10)+'..':data.subjects[sub]); 
+            scores.push(tot); 
+        } 
+        let avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:0; 
+        document.getElementById('chartStats').innerHTML=`<div style="background:white;padding:10px;border-radius:12px;">${s.name}<br>Avg: ${avg.toFixed(1)}% | Grade: ${calculateGrade(avg)}</div>`; 
+        let ctx=document.getElementById('performanceChart').getContext('2d'); 
+        if(chartInstance) chartInstance.destroy(); 
+        chartInstance=new Chart(ctx,{type:'bar',data:{labels:subs,datasets:[{label:'Score',data:scores,backgroundColor:'#3d2314'}]},options:{responsive:true,scales:{y:{min:0,max:100}}}}); 
+    }
+    
+    function closeChartModal(){ 
+        document.getElementById('chartModal').style.display='none'; 
+        if(chartInstance) chartInstance.destroy(); 
+    }
+    
+    function validateSchoolInfo() { 
+        let school = JSON.parse(localStorage.getItem('bfa_school_info')) || {}; 
+        let missing = []; 
+        if(!school.stud) missing.push("School Name"); 
+        if(!school.cls) missing.push("Class"); 
+        if(!school.teacher) missing.push("Class Teacher's Name"); 
+        if(!school.prn) missing.push("Headmaster's Name"); 
+        if(!school.sess) missing.push("Session"); 
+        if(!school.trm) missing.push("Term"); 
+        if(missing.length > 0) { 
+            alert(`⚠️ Please fill the following School Information first:\n${missing.join(", ")}\n\nGo to School Info page and save.`); 
+            showPage('infoPage'); 
+            return false; 
+        } 
+        return true; 
+    }
+    
+    function openResultSelector() { 
+        if(!data.students.length) { 
+            alert("No students added. Please add students first."); 
+            return; 
+        } 
+        if(!validateSchoolInfo()) return; 
+        let sel = document.getElementById('resultStudentSelect'); 
+        sel.innerHTML = '<option value="">-- Select Student --</option>'; 
+        data.students.forEach((s,idx)=>{ 
+            let opt = document.createElement('option'); 
+            opt.value = idx; 
+            opt.textContent = `${s.name} (${s.gender})`; 
+            sel.appendChild(opt); 
+        }); 
+        document.getElementById('resultModal').style.display='block'; 
+        if(data.students.length) generateSingleResult(); 
+    }
+    
+    function generateSingleResult() { 
+        let idx = document.getElementById('resultStudentSelect').value; 
+        if(idx === "") return; 
+        generateResultForStudent(parseInt(idx)); 
+    }
+    
+    let currentSelectedStudentName = "";
+    let currentSelectedStudentId = -1;
+    
+    function getLogoHTML() {
+        // Try to load logo.png, fallback to school icon if not available
+        return `<img src="logo.png" alt="School Logo" class="header-logo" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\\'logo-placeholder\\'><i class=\\'fas fa-graduation-cap\\'></i></div>';">`;
+    }
+    
+    function generateResultForStudent(studentIdx) {
+        let school = JSON.parse(localStorage.getItem('bfa_school_info')) || {};
+        let student = data.students[studentIdx];
+        currentSelectedStudentName = student.name;
+        currentSelectedStudentId = studentIdx;
+        let rows = '', totalMarks = 0, subjectCount = 0;
+        for(let sub=0; sub<data.subjects.length; sub++) {
+            let m = (marksData[sub] && marksData[sub][studentIdx]) ? marksData[sub][studentIdx] : {ca1:0, ca2:0, exam:0};
+            let tot = (Number(m.ca1)||0)+(Number(m.ca2)||0)+(Number(m.exam)||0);
+            totalMarks += tot; subjectCount++;
+            let grade = calculateGrade(tot);
+            rows += `<tr><td style="text-align:left; font-weight:bold;">${data.subjects[sub]}</td> <td>${m.ca1||0}</td> <td>${m.ca2||0}</td> <td>${m.exam||0}</td> <td><strong>${tot}</strong></td> <td><strong>${grade}</strong></td> <td>${getRemark(grade)}</td></tr>`;
+        }
+        let average = subjectCount ? (totalMarks / subjectCount) : 0;
+        let teacherRemark = average < 40 ? "Fail" : average < 45 ? "Weak Pass" : average < 50 ? "Pass" : average < 60 ? "Good" : average < 70 ? "Very Good" : "Excellent";
+        let position = getStudentPosition(studentIdx);
+        let nextTermInfo = school.begin ? `Next Term Begins: ${formatDateDMY(school.begin)}` : 'Next Term Begins: __________';
+        let sessionDisplay = school.sess ? `${school.sess} Academic Session` : 'Academic Session';
+        
+        // Get school name from saved data or use default
+        let schoolName = school.stud || DEFAULT_SCHOOL_NAME || 'BRIGHT FUTURE ACADEMY';
+        
+        let html = `<div class="result-card" id="resultCard_${studentIdx}">
+            <div class="result-header">
+                ${getLogoHTML()}
+                <div class="header-text">
+                    <h1>${schoolName}</h1>
+                    <h3>${school.trm || 'Term'} Academic Performance Report</h3>
+                    <div class="session-bold">${sessionDisplay}</div>
+                </div>
+                <div class="header-spacer"></div>
+            </div>
+            <table class="info-table-bw">
+                <tr><td>Student Name</td><td colspan="3">${student.name}</td></tr>
+                <tr><td>Gender</td><td>${student.gender}</td><td>Position</td><td><strong>${position}${position===1?'st':position===2?'nd':position===3?'rd':'th'} out of ${data.students.length}</strong></td></tr>
+                <tr><td>Class</td><td>${school.cls || ''}</td><td>Department</td><td>${school.dept || ''}</td></tr>
+            </table>
+            <table class="results-table-bw">
+                <thead><tr><th>Subject</th><th>CA1</th><th>CA2</th><th>Exam</th><th>Total</th><th>Grade</th><th>Remark</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+            <div class="summary-section">
+                <div class="summary-grid">
+                    <span><strong>📊 Total Score:</strong> ${totalMarks} / ${subjectCount*100}</span>
+                    <span><strong>📈 Overall Average:</strong> ${average.toFixed(1)}%</span>
+                </div>
+            </div>
+            <div class="teacher-remark"><strong>Teacher's Remark:</strong> ${teacherRemark}</div>
+            <div class="next-term">${nextTermInfo}</div>
+            <div class="signature-area-bw">
+                <div class="signature-line"><strong>Class Teacher:</strong> ${school.teacher || '________________'}<br>Signature: ___________</div>
+                <div class="signature-line"><strong>Headmaster:</strong> ${school.prn || '________________'}<br>Signature: ___________</div>
+            </div>
+        </div>`;
+        document.getElementById('modalResultContent').innerHTML = html;
+    }
+    
+    function generateFullResults() {
+        if(!validateSchoolInfo()) return;
+        if(!data.students.length) { alert("No students"); return; }
+        let allHtml = '';
+        let sortedStudents = getStudentsSortedByPerformance();
+        let school = JSON.parse(localStorage.getItem('bfa_school_info')) || {};
+        let schoolName = school.stud || DEFAULT_SCHOOL_NAME;
+        
+        currentSelectedStudentName = "All_Students";
+        currentSelectedStudentId = -1;
+        
+        for(let i=0; i<sortedStudents.length; i++) {
+            let studentData = sortedStudents[i];
+            let student = data.students[studentData.idx];
+            let rows = '', total = 0, count = 0;
+            for(let sub=0; sub<data.subjects.length; sub++) {
+                let m=(marksData[sub]&&marksData[sub][studentData.idx])?marksData[sub][studentData.idx]:{ca1:0,ca2:0,exam:0};
+                let tot=(Number(m.ca1)||0)+(Number(m.ca2)||0)+(Number(m.exam)||0);
+                total+=tot; count++;
+                let grade=calculateGrade(tot);
+                rows+=`<tr><td style="text-align:left;font-weight:bold;">${data.subjects[sub]}</td><td>${m.ca1||0}</td><td>${m.ca2||0}</td><td>${m.exam||0}</td><td><strong>${tot}</strong></td><td><strong>${grade}</strong></td><td>${getRemark(grade)}</td></tr>`;
+            }
+            let avg=count?total/count:0;
+            let teacherRemark = avg < 40 ? "Fail" : avg < 45 ? "Weak Pass" : avg < 50 ? "Pass" : avg < 60 ? "Good" : avg < 70 ? "Very Good" : "Excellent";
+            let pos = getStudentPosition(studentData.idx);
+            let nextTerm = school.begin ? `Next Term Begins: ${formatDateDMY(school.begin)}` : 'Next Term Begins: __________';
+            let sessionDisplay = school.sess ? `${school.sess} Academic Session` : 'Academic Session';
+            allHtml += `<div class="result-card" style="margin-bottom:20px; page-break-after:always;" id="resultCard_${studentData.idx}">
+                <div class="result-header">
+                    ${getLogoHTML()}
+                    <div class="header-text">
+                        <h1>${schoolName}</h1>
+                        <h3>${school.trm||'Term'} Academic Performance Report</h3>
+                        <div class="session-bold">${sessionDisplay}</div>
+                    </div>
+                    <div class="header-spacer"></div>
+                </div>
+                <table class="info-table-bw">
+                    <tr><td>Student Name</td><td colspan="3">${student.name}</td></tr>
+                    <tr><td>Gender</td><td>${student.gender}</td><td>Position</td><td><strong>${pos}${pos===1?'st':pos===2?'nd':pos===3?'rd':'th'}</strong></td></tr>
+                    <tr><td>Class</td><td>${school.cls || ''}</td><td>Department</td><td>${school.dept || ''}</td></tr>
+                </table>
+                <table class="results-table-bw">
+                    <thead><tr><th>Subject</th><th>CA1</th><th>CA2</th><th>Exam</th><th>Total</th><th>Grade</th><th>Remark</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <div class="summary-section">
+                    <div class="summary-grid">
+                        <span><strong>📊 Total Score:</strong> ${total}/${count*100}</span>
+                        <span><strong>📈 Overall Average:</strong> ${avg.toFixed(1)}%</span>
+                    </div>
+                </div>
+                <div class="teacher-remark"><strong>Teacher's Remark:</strong> ${teacherRemark}</div>
+                <div class="next-term">${nextTerm}</div>
+                <div class="signature-area-bw">
+                    <div class="signature-line"><strong>Class Teacher:</strong> ${school.teacher||'______'}<br>Signature: ___________</div>
+                    <div class="signature-line"><strong>Headmaster:</strong> ${school.prn||'______'}<br>Signature: ___________</div>
+                </div>
+            </div>`;
+        }
+        document.getElementById('modalResultContent').innerHTML = allHtml;
+    }
+    
+    function printResults() {
+        const content = document.getElementById('modalResultContent');
+        if(!content.innerHTML.trim()) {
+            alert("No result content to print. Please generate a result first.");
+            return;
+        }
+        window.print();
+    }
+    
+    function closeModal(){ document.getElementById('resultModal').style.display='none'; }
+    window.onclick=function(e){ if(e.target===document.getElementById('resultModal')) closeModal(); if(e.target===document.getElementById('chartModal')) closeChartModal(); }
+    
+    const toggleBtn = document.getElementById('toggleBulkBtn'); 
+    const bulkWrapper = document.getElementById('bulkAreaWrapper');
+    if(toggleBtn) toggleBtn.onclick = () => { 
+        bulkWrapper.classList.toggle('show'); 
+        toggleBtn.innerHTML = bulkWrapper.classList.contains('show') ? '<i class="fas fa-chevron-up"></i> Hide' : '<i class="fas fa-chevron-down"></i> Show Paste Area'; 
+    };
+    
+    document.getElementById('passwordLoginBtn').addEventListener('click', authenticateWithPassword);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('logoutInsideStickyBtn')?.addEventListener('click', logout);
+    
+    window.showPage=showPage; 
+    window.toggleList=toggleList; 
+    window.addItem=addItem; 
+    window.addStudentItem=addStudentItem;
+    window.editItem=editItem; 
+    window.removeItem=removeItem; 
+    window.saveListData=saveListData; 
+    window.secureReset=secureReset;
+    window.saveSchoolData=saveSchoolData; 
+    window.startMarkEntry=startMarkEntry; 
+    window.checkLimit=checkLimit;
+    window.saveAllMarks=saveAllMarks; 
+    window.navigateSubject=navigateSubject; 
+    window.generateFullResults=generateFullResults;
+    window.printResults = printResults;
+    window.closeModal=closeModal; 
+    window.showPerformanceChart=showPerformanceChart;
+    window.updateChart=updateChart; 
+    window.closeChartModal=closeChartModal; 
+    window.openResultSelector=openResultSelector;
+    window.generateSingleResult=generateSingleResult;
+    
+    window.exportAllData = exportAllData;
+    window.toggleImport = toggleImport;
+    window.importAllData = importAllData;
+    
+    // Clean up marks data on load to ensure consistency
+    cleanupMarksData();
+</script>
+</body>
+</html>
